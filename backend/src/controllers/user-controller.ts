@@ -21,15 +21,25 @@ export const userSignup = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log("body " + req.body);
-  const { name, email, password } = await req.body;
-  // if (!password) {
-  //   throw new Error("Password is required for hashing");
-  // }
-  const hashedPassword = await hash(password || "", 10);
-  const user = new User({ name, email, hashedPassword });
-  await user.save();
-  return res
-    .status(201)
-    .json({ message: "User created successfully", id: user._id.toString() });
+  try {
+    console.log("body " + req.body);
+    const { name, email, password } = await req.body;
+    console.log("here");
+    console.log("name" + name);
+    console.log("email" + email);
+    console.log("password" + password);
+
+    // if (!password) {
+    //   throw new Error("Password is required for hashing");
+    // }
+    const hashedPassword = await hash(password, 10);
+    const user = new User({ name, email, password: hashedPassword });
+    await user.save();
+    return res
+      .status(201)
+      .json({ message: "User created successfully", id: user._id.toString() });
+  } catch (err) {
+    console.log(err);
+    res.send(err);
+  }
 };
