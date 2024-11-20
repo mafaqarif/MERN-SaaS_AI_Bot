@@ -5,7 +5,7 @@ export const validate = (validations: ValidationChain[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     for (let validation of validations) {
       const result = await validation.run(req);
-      if (result.isEmpty()) {
+      if (!result.isEmpty()) {
         break;
       }
     }
@@ -18,11 +18,15 @@ export const validate = (validations: ValidationChain[]) => {
   };
 };
 
-export const signupValidator = [
-  body("name").notEmpty().withMessage("Please enter"),
+export const loginValidator = [
   body("email").trim().isEmail().withMessage("Please enter email"),
   body("password")
     .trim()
     .isLength({ min: 6 })
     .withMessage("Please enter password should be atleast 6 characters"),
+];
+
+export const signupValidator = [
+  body("name").notEmpty().withMessage("Please enter"),
+  ...loginValidator,
 ];

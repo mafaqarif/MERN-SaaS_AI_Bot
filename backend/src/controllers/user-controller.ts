@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import User from "../models/User";
-import { hash } from "bcrypt";
+import { hash, compare } from "bcrypt";
 
 export const getAllUsers = async (
   req: Request,
@@ -22,13 +22,12 @@ export const userSignup = async (
   next: NextFunction
 ) => {
   try {
-    console.log("body " + req.body);
     const { name, email, password } = await req.body;
-    console.log("here");
-    console.log("name" + name);
-    console.log("email" + email);
-    console.log("password" + password);
+    const existingUser = await User.findOne({ email });
 
+    if (existingUser) {
+      return res.status(409).json({ message: "Email already exists" });
+    }
     // if (!password) {
     //   throw new Error("Password is required for hashing");
     // }
@@ -41,5 +40,29 @@ export const userSignup = async (
   } catch (err) {
     console.log(err);
     res.send(err);
+  }
+};
+
+export const userLogin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // user login request
+  try {
+    const { email, password } = req.body;
+    const existingUser = await User.findOne({ email });
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const isPasswordCorrect = await compare(password, existingUser.password);
+    if (!isPasswordCorrect) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    res.status(200).json({ message: "User login successful" });
+  } catch (error) {
+    console.log(error);
+    res.status(200).json({ message: "there was an error" });
   }
 };
