@@ -44,11 +44,7 @@ export const userSignup = async (
       path: "/",
     });
 
-    const token = createToken(
-      existingUser._id.toString(),
-      existingUser.email,
-      "7d"
-    );
+    const token = createToken(user._id.toString(), user.email, "7d");
     return res
       .status(201)
       .json({ message: "User created successfully", id: user._id.toString() });
