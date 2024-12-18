@@ -45,9 +45,12 @@ export const userSignup = async (
     });
 
     const token = createToken(user._id.toString(), user.email, "7d");
-    return res
-      .status(201)
-      .json({ message: "User created successfully", id: user._id.toString() });
+    return res.status(201).json({
+      message: "User created successfully",
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+    });
   } catch (err) {
     console.log(err);
     res.send(err);
@@ -94,9 +97,13 @@ export const userLogin = async (
       signed: true,
     });
 
-    res.status(200).json({ message: "User login successful" });
+    return res.status(200).json({
+      message: "User login successful",
+      name: existingUser.name,
+      email: existingUser.email,
+    });
   } catch (error) {
     console.log(error);
-    res.status(200).json({ message: "there was an error" });
+    return res.status(200).json({ message: "there was an error" });
   }
 };
