@@ -67,7 +67,8 @@ export const userLogin = async (
     const { email, password } = req.body;
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found" });
+      return;
     }
     const isPasswordCorrect = await compare(password, existingUser.password);
     if (!isPasswordCorrect) {
@@ -97,13 +98,13 @@ export const userLogin = async (
       signed: true,
     });
 
-    return res.status(200).json({
+    res.status(200).json({
       message: "User login successful",
       name: existingUser.name,
       email: existingUser.email,
     });
   } catch (error) {
-    console.log(error);
-    return res.status(200).json({ message: "there was an error" });
+    console.log("there was an error : " + error);
+    res.status(200).json({ message: "there was an error" });
   }
 };
