@@ -4,9 +4,14 @@ import CustomizedInput from "../components/shared/CustomizedInput";
 import { IoIosLogIn } from "react-icons/io";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
+import { Navigate } from "react-router-dom";
 
 const Login = () => {
   const auth = useAuth();
+  if (auth?.user) {
+    // if user is logged in, redirect to home page
+    return <Navigate to="/" replace />;
+  }
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // TODO: Send login request to the server
@@ -16,7 +21,9 @@ const Login = () => {
     console.log(email, password);
 
     try {
+      // toast for the notifications
       toast.loading("Signing in...", { id: "login" });
+      // login function from auth context
       await auth?.login(email, password);
       toast.success("Logged in successfully!", { id: "login" });
     } catch (error) {
@@ -65,8 +72,8 @@ const Login = () => {
             >
               Login
             </Typography>
-            <CustomizedInput type="email" label="label" name="email" />
-            <CustomizedInput type="password" label="password" name="password" />
+            <CustomizedInput type="email" label="Email" name="email" />
+            <CustomizedInput type="password" label="Password" name="password" />
             <Button
               type="submit"
               sx={{

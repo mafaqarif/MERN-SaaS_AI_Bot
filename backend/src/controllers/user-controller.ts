@@ -108,3 +108,29 @@ export const userLogin = async (
     res.status(200).json({ message: "there was an error" });
   }
 };
+
+export const verifyUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // user login request
+  try {
+    const existingUser = await User.findById(res.locals.jwtData.id);
+    if (!existingUser) {
+      return res.status(401).send("User not Registered Or Token expired");
+    }
+    if (existingUser._id.toString() !== res.locals.jwtData.id) {
+      return res.status(401).send("Permissions didn't match");
+    }
+
+    res.status(200).json({
+      message: "User login successful",
+      name: existingUser.name,
+      email: existingUser.email,
+    });
+  } catch (error) {
+    console.log("there was an error : " + error);
+    res.status(200).json({ message: "there was an error" });
+  }
+};
