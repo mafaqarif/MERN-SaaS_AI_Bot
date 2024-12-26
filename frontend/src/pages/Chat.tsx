@@ -6,12 +6,17 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import React, { useRef, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { red } from "@mui/material/colors";
 import ChatItem from "../components/chat/ChatItem";
 import { IoMdSend } from "react-icons/io";
-import { sendChatMessage } from "../helpers/api-communicator";
+import {
+  deleteUserChats,
+  getUserChats,
+  sendChatMessage,
+} from "../helpers/api-communicator";
+import toast from "react-hot-toast";
 
 // const chatMessages = [
 //   {
@@ -50,6 +55,7 @@ const Chat = () => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [chatMessages, setChatMessages] = useState<Messages[]>([]);
   const auth = useAuth();
+  // submit send message
   const handleSubmit = async () => {
     const content = inputRef.current?.value as string;
     if (inputRef && inputRef.current) {
@@ -60,6 +66,34 @@ const Chat = () => {
     const chatData = await sendChatMessage(content);
     setChatMessages([...chatData.chats]);
   };
+  // delete chats
+  const handleDeleteChats = async () => {
+    try {
+      toast.loading("Deleting chats", { id: "deleting-chat" });
+      await deleteUserChats();
+      setChatMessages([]);
+      toast.success("Chats deleted successfully", { id: "deleting-chat" });
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to delete chats", { id: "deleting-chat" });
+    }
+  };
+
+  // get chats initially
+  useLayoutEffect(() => {
+    if (auth?.isLoggedIn && auth?.user) {
+      toast.loading("Loading chats", { id: "loading-chat" });
+      getUserChats()
+        .then((data) => {
+          setChatMessages([...data.chats]);
+          toast.success("Chats loaded successfully", { id: "loading-chat" });
+        })
+        .catch((error) => {
+          console.log(error);
+          toast.error("Failed to load chats", { id: "loading-chat" });
+        });
+    }
+  }, [auth]);
   return (
     // main box
     <Box
@@ -117,6 +151,7 @@ const Chat = () => {
           </Typography>
 
           <Button
+            onClick={handleDeleteChats}
             sx={{
               width: "200px",
               my: "auto",

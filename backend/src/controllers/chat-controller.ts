@@ -46,3 +46,55 @@ export const generateChatCompletion = async (
     return res.status(500).json({ message: "Error", cause: error });
   }
 };
+
+export const sendChatsToUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // user login request
+  try {
+    const existingUser = await User.findById(res.locals.jwtData.id);
+    if (!existingUser) {
+      return res.status(401).send("User not Registered Or Token expired");
+    }
+    if (existingUser._id.toString() !== res.locals.jwtData.id) {
+      return res.status(401).send("Permissions didn't match");
+    }
+
+    res.status(200).json({
+      message: "User login successful",
+      chats: existingUser.chats,
+    });
+  } catch (error) {
+    console.log("there was an error : " + error);
+    res.status(200).json({ message: "there was an error" });
+  }
+};
+
+export const deleteChats = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // user login request
+  try {
+    const existingUser = await User.findById(res.locals.jwtData.id);
+    if (!existingUser) {
+      return res.status(401).send("User not Registered Or Token expired");
+    }
+    if (existingUser._id.toString() !== res.locals.jwtData.id) {
+      return res.status(401).send("Permissions didn't match");
+    }
+    //@ts-ignore
+    existingUser.chats = [];
+    await existingUser.save();
+
+    res.status(200).json({
+      message: "User login successful",
+    });
+  } catch (error) {
+    console.log("there was an error : " + error);
+    res.status(200).json({ message: "there was an error" });
+  }
+};
