@@ -1,12 +1,5 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Icon,
-  IconButton,
-  Typography,
-} from "@mui/material";
-import React, { useLayoutEffect, useRef, useState } from "react";
+import { Avatar, Box, Button, IconButton, Typography } from "@mui/material";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { red } from "@mui/material/colors";
 import ChatItem from "../components/chat/ChatItem";
@@ -17,6 +10,7 @@ import {
   sendChatMessage,
 } from "../helpers/api-communicator";
 import toast from "react-hot-toast";
+import { Navigate, useNavigate } from "react-router-dom";
 
 // const chatMessages = [
 //   {
@@ -54,6 +48,7 @@ type Messages = {
 const Chat = () => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [chatMessages, setChatMessages] = useState<Messages[]>([]);
+  const navigate = useNavigate();
   const auth = useAuth();
   // submit send message
   const handleSubmit = async () => {
@@ -94,6 +89,15 @@ const Chat = () => {
         });
     }
   }, [auth]);
+
+  // if no user , move to login
+
+  useEffect(() => {
+    if (!auth?.user) {
+      navigate("/login");
+    }
+  }, [auth]);
+
   return (
     // main box
     <Box

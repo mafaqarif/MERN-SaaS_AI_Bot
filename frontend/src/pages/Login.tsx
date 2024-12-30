@@ -1,17 +1,16 @@
 import { Box, Button, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import CustomizedInput from "../components/shared/CustomizedInput";
 import { IoIosLogIn } from "react-icons/io";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const navigate = useNavigate();
+
   const auth = useAuth();
-  if (auth?.user) {
-    // if user is logged in, redirect to home page
-    return <Navigate to="/" replace />;
-  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // TODO: Send login request to the server
@@ -33,6 +32,14 @@ const Login = () => {
       });
     }
   };
+
+  //@ts-ignore
+  useEffect(() => {
+    if (auth?.user) {
+      // if user is logged in, redirect to home page
+      navigate("/");
+    }
+  }, [auth]);
   return (
     <Box width={"100%"} height={"100%"} display="flex" flex={1}>
       <Box padding={8} mt={8} display={{ md: "flex", sm: "none", xs: "none" }}>
